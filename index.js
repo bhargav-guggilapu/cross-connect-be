@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -19,7 +20,7 @@ app.get("/", (req, res) => {
 
 mongoose
   .connect(
-    "mongodb+srv://bhargavguggilapu:VojMJJG1fddcFbe7@db.6q7tt.mongodb.net/crossConnect?retryWrites=true&w=majority&appName=DB"
+    `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@db.6q7tt.mongodb.net/crossConnect?retryWrites=true&w=majority&appName=DB`
   )
   .then(() => {
     console.log("Connected to database!");
