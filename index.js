@@ -15,7 +15,7 @@ app.use("/users", userRoute);
 app.use("/prohibitedItems", prohibitedItemRoute);
 
 app.get("/", (req, res) => {
-  res.send("Hello from Cross Connect API Server");
+  res.send("Hello from Cross Connect API Server!!!");
 });
 
 mongoose
