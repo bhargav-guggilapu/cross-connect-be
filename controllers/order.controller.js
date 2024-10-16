@@ -1,3 +1,4 @@
+const { ORDER_STATUS } = require("../constants");
 const Order = require("../models/order.model");
 
 const getOrder = async (req, res) => {
@@ -41,8 +42,30 @@ const updateOrder = async (req, res) => {
   }
 };
 
+const getOrdersByAgent = async (req, res) => {
+  const { agent } = req.query;
+
+  if (agent) {
+    const orders = await Order.find({
+      agent,
+      orderStatus: ORDER_STATUS.ACTIVE,
+    }).populate("customer");
+
+    if (!orders) {
+      return res
+        .status(404)
+        .json({ message: `Orders not found for agent: ${agent}` });
+    }
+
+    res.status(200).json(orders);
+  } else {
+    res.status(400).json({ message: "Agent ID is required" });
+  }
+};
+
 module.exports = {
   getOrder,
   createOrder,
   updateOrder,
+  getOrdersByAgent,
 };
