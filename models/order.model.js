@@ -77,6 +77,7 @@ const OrderSchema = mongoose.Schema(
     packageWeight: Number,
     shippingCost: Number,
     trackingId: String,
+    deliveredDate: String,
 
     items: [
       {
