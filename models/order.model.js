@@ -78,6 +78,7 @@ const OrderSchema = mongoose.Schema(
     shippingCost: Number,
     trackingId: String,
     deliveredDate: String,
+    tipAmount: Number,
 
     items: [
       {
