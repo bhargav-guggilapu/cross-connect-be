@@ -37,8 +37,8 @@ const UserSchema = mongoose.Schema(
     zipCode: String,
     phoneNumber: String,
 
-    ordersDelivered: String,
-    rating: String,
+    ordersDelivered: { type: Number, default: 0 },
+    rating: { type: Number, default: 0 },
     photo: String,
 
     address: {

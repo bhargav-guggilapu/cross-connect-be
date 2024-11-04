@@ -26,7 +26,7 @@ const getByEmail = async (req, res) => {
   if (email) {
     const user = await User.find({ email }).populate("selectedAgent");
 
-    if (!user) {
+    if (user.length === 0) {
       return res
         .status(404)
         .json({ message: `User not found with email: ${email}` });
@@ -35,6 +35,23 @@ const getByEmail = async (req, res) => {
     res.status(200).json(user);
   } else {
     res.status(400).json({ message: "Email ID is required" });
+  }
+};
+
+const updateDeliveries = async (req, res) => {
+  const id = req.query.id;
+
+  if (id) {
+    const user = await User.find({ _id: id });
+    await User.findOneAndUpdate(
+      { _id: id },
+      {
+        ordersDelivered: user[0].ordersDelivered + 1,
+      }
+    );
+    res.status(200).json(userUpdated);
+  } else {
+    res.status(400).json({ message: "ID is required" });
   }
 };
 
@@ -108,5 +125,6 @@ module.exports = {
   updateUser,
   deleteUser,
   getByEmail,
+  updateDeliveries,
   getAgentsByZipCode,
 };
