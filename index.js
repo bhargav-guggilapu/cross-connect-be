@@ -190,7 +190,7 @@ io.on("connection", (socket) => {
         });
       }
 
-      if (!onlineUsers[receiverData[0]._id].isOnline) {
+      if (!onlineUsers[receiverData[0]._id]?.isOnline) {
         await sendEmail(
           receiverData[0].email,
           "New Message Notification",
