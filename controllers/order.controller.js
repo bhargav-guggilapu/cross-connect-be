@@ -4,7 +4,7 @@ const Order = require("../models/order.model");
 const getOrder = async (req, res) => {
   const filters = req.query;
 
-  const order = await Order.find(filters).populate("agent");
+  const order = await Order.find(filters).populate("agent").populate("customer");
 
   if (!order) {
     return res.status(404).json({

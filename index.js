@@ -129,6 +129,18 @@ app.post("/cancel-payment-intent", async (req, res) => {
   }
 });
 
+app.post("/send-email", async (req, res) => {
+  const { to, subject, html } = req.body;
+
+  try {
+    await sendEmail(to, subject, html);
+
+    res.json({ message: "Email Sent Successfully!" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
@@ -183,7 +195,7 @@ io.on("connection", (socket) => {
           receiverData[0].email,
           "New Message Notification",
           `
-              <h3>Hello,</h3>
+              <h3>Dear ${receiverData.firstName},</h3>
               <p>You have received a new message from <b>${senderData[0].firstName} ${senderData[0].lastName}</b> while you were offline.</p>
               <p>Here’s what they said:</p>
               <blockquote style="border-left: 4px solid #ccc; padding-left: 10px; color: #555;">
