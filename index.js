@@ -195,7 +195,7 @@ io.on("connection", (socket) => {
           receiverData[0].email,
           "New Message Notification",
           `
-              <h3>Dear ${receiverData.firstName},</h3>
+              <h3>Dear ${receiverData[0].firstName},</h3>
               <p>You have received a new message from <b>${senderData[0].firstName} ${senderData[0].lastName}</b> while you were offline.</p>
               <p>Here’s what they said:</p>
               <blockquote style="border-left: 4px solid #ccc; padding-left: 10px; color: #555;">
