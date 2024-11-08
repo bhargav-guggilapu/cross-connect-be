@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const http = require("http");
@@ -12,11 +13,43 @@ const orderRoute = require("./routes/order.route.js");
 
 const Order = require("./models/order.model.js");
 const { IN_PROGRESS_STATUS } = require("./constants.js");
+const User = require("./models/user.model.js");
 
 const fetchExchangeRate = async () => {
   const response = await fetch("https://open.er-api.com/v6/latest/USD");
   const result = await response.json();
   return result.rates["INR"];
+};
+
+const sendEmail = async (to, subject, html) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const message = {
+    from: {
+      name: "Cross Connect",
+      address: process.env.EMAIL,
+    },
+    to,
+    subject,
+    html,
+  };
+
+  transporter
+    .sendMail(message)
+    .then((info) => {
+      console.log("Email sent successfully to: " + info.accepted[0]);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 
 const app = express();
@@ -124,6 +157,43 @@ io.on("connection", (socket) => {
       const newMessage = new ChatMessage({ roomId, senderId, message });
 
       await newMessage.save();
+
+      const senderData = await User.find({ _id: senderId });
+      let receiverData;
+      if (senderId == agentId) {
+        receiverData = await User.find({ _id: customerId });
+      } else if (senderId == customerId) {
+        receiverData = await User.find({ _id: agentId });
+      }
+
+      if (senderData.length === 0) {
+        return res.status(404).json({
+          message: `Sender not found`,
+        });
+      }
+
+      if (receiverData.length === 0) {
+        return res.status(404).json({
+          message: `Receiver not found`,
+        });
+      }
+
+      if (!onlineUsers[receiverData[0]._id].isOnline) {
+        await sendEmail(
+          receiverData[0].email,
+          "New Message Notification",
+          `
+              <h3>Hello,</h3>
+              <p>You have received a new message from <b>${senderData[0].firstName} ${senderData[0].lastName}</b> while you were offline.</p>
+              <p>Here’s what they said:</p>
+              <blockquote style="border-left: 4px solid #ccc; padding-left: 10px; color: #555;">
+                  ${message}
+              </blockquote>
+              <p>To reply, please log in to your account.</p>
+              <p>Thank you,<br>Cross Connect</p>
+          `
+        );
+      }
 
       io.to(roomId).emit("receiveMessage", newMessage);
     }
