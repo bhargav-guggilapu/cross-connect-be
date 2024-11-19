@@ -46,10 +46,10 @@ const updateDeliveries = async (req, res) => {
     await User.findOneAndUpdate(
       { _id: id },
       {
-        ordersDelivered: user[0].ordersDelivered + 1,
+        ordersDelivered: (user[0].ordersDelivered || 0) + 1,
       }
     );
-    res.status(200).json(userUpdated);
+    res.status(200).json({ message: "Orders delivered updated successfully" });
   } else {
     res.status(400).json({ message: "ID is required" });
   }
